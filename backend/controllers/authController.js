@@ -65,7 +65,30 @@ const registerUser = async(req,res) =>{
 
 
 const loginUser = async(req,res) =>{
-        try{}catch(error){
+        try{
+            const {email,password} = req.body;
+            const user = await User.findOne({email});
+            if(!user){
+                return res.status(401).json({message:"Invalid credentials"});
+            }
+
+            //compare password
+            const isMatch = await bcrypt.compare(password,user.password);
+            if(!isMatch){
+                return res.status(401).json({message:"Invalid email or password"});
+            }
+            //Return user data with JWT
+            res.json({
+                _id:user._id,
+                name:user.name,
+                email:user.email,
+                profileImageUrl:user.profileImageUrl,
+                role:user.role,
+                token:generateToken(user._id),
+            });
+            
+
+        }catch(error){
         res.status(500).json({message:"Server Error",error:error.message});
     }
 };
