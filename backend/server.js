@@ -5,11 +5,16 @@ const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db");
 
-
-
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+// const userRoutes = require("./routes/userRoutes"); // If routes are merged, you can skip this
 
 const app = express();
+
+// Connect Database
+connectDB();
+
+
 
 // Middleware to handle CORS
 app.use(
@@ -20,18 +25,20 @@ app.use(
   })
 );
 
-// Connect Database
-connectDB();
-
-
-// Middleware
+// JSON Parser
 app.use(express.json());
+
+// Serve static files from /uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/api/auth", authRoutes);
-// app.use("/api/user", userRoutes);
-// app.use("/api/task", taskRoutes);
-// app.use("/api/report", reportRoutes);
+app.use("/api/users",userRoutes);
+
+
+
+
+// app.use("/api/user", userRoutes); // Optional: use if userRoutes is separate
 
 // Start Server
 const PORT = process.env.PORT || 5000;
