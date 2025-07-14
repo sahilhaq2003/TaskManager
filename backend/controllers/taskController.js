@@ -89,13 +89,21 @@ const getTask = async (req, res) => {
 //@access Private (Admin: all, User: assigned)
 
 const getTaskById = async (req, res) => {
-     try{
+    try {
+        const task = await Task.findById(req.params.id).populate(
+            "assignedTo",
+            "name email profileImageUrl"
+        );
 
-    }catch (error) {
+        if (!task) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        res.status(200).json(task); 
+    } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
- 
-}
+};
 
 
 
