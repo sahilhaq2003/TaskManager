@@ -286,13 +286,83 @@ const updateTaskChecklist = async (req, res) => {
 
 //@desc Get dashboard data (Admin)
 //@route GET /api/tasks/dashboard-data
+//1.23.31
 const getDashboardData = async (req, res) => {
-    try{
+    try {
+        // Fetch statistics for admin dashboard
+        const totalTasks = await Task.countDocuments();
+        const pendingTasks = await Task.countDocuments({ status: "Pending" });
+        const completedTasks = await Task.countDocuments({ status: "Completed" });
+        const inProgressTasks = await Task.countDocuments({ status: "In progress" });
+        const overdueTasks = await Task.countDocuments({
+            dueDate: { $lt: new Date() },
+            status: { $ne: "Completed" },
+        });
 
-    }catch (error) {
+        // Ensure all possible statuses are included
+        const taskStatuses = ["Pending", "In progress", "Completed"];
+        const taskDistributionRaw = await Task.aggregate([
+            {
+                $group: {
+                    _id: "$status",
+                    count: { $sum: 1 },
+                },
+            },
+        ]);
+
+        const taskDistribution = taskStatuses.reduce((acc, status) => {
+            const formattedKey = status.replace(/\s+/g, "_");
+            acc[formattedKey] = taskDistributionRaw.find(
+                (item) => item._id === status
+            )?.count || 0;
+            return acc;
+        }, {});
+        taskDistribution["All"] = totalTasks;
+
+        // Ensure all priorities are included
+        const taskPriorities = ["Low", "Medium", "High"];
+        const taskPriorityLevelsRaw = await Task.aggregate([
+            {
+                $group: {
+                    _id: "$priority",
+                    count: { $sum: 1 },
+                },
+            },
+        ]);
+
+        const taskPriorityLevels = taskPriorities.reduce((acc, priority) => {
+            acc[priority] = taskPriorityLevelsRaw.find(item => item._id === priority)?.count || 0;
+            return acc;
+        }, {});
+
+        // Fetch recent 10 tasks
+        const recentTasks = await Task.find()
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .select("title status priority dueDate assignedTo createdAt");
+
+        res.status(200).json({
+            statistics: {
+                totalTasks,
+                pendingTasks,
+                completedTasks,
+                inProgressTasks,
+                overdueTasks,
+            },
+
+            charts: {
+                taskDistribution,
+                taskPriorityLevels,
+            },
+
+            recentTasks,
+        });
+
+    } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 }
+
 
 //@desc Get user dashboard data (User)
 //@route GET /api/tasks/user-dashboard-data
