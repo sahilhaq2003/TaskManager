@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import AuthLayout from '../../components/layouts/AuthLayout';
 import Input from '../../components/layouts/Inputs/Input';
 import { validateEmail } from '../../utils/helper';
+import axiosInstance from '../../utils/axiosInstance';
+import { API_PATHS } from '../../utils/apiPaths';
+import { UserContext } from '../../context/userContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { updateUser } = useContext(UserContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,9 +23,10 @@ const Login = () => {
     if (!password) return setError('Enter your password.');
 
     setError(null);
+    setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:8000/api/auth/login', {
+      const res = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
         email,
         password,
       });
@@ -29,10 +34,14 @@ const Login = () => {
       const { token, role } = res.data;
 
       localStorage.setItem('token', token);
-      navigate(role === 'admin' ? '/admin-dashboard' : '/dashboard');
+      updateUser(res.data);
+
+      navigate(role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please try again.';
       setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,7 +53,9 @@ const Login = () => {
           <p className="text-sm text-gray-600 mb-6 text-center">Login to continue</p>
 
           {error && (
-            <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+            <p className="text-red-500 text-sm mb-4 text-center" aria-live="polite">
+              {error}
+            </p>
           )}
 
           <form onSubmit={handleLogin} className="space-y-5">
@@ -66,9 +77,10 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl shadow-md transition-all text-sm font-semibold"
+              disabled={loading}
+              className="w-full py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl shadow-md transition-all text-sm font-semibold disabled:opacity-50"
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
 
             <p className="text-xs text-center text-gray-500 mt-4">
