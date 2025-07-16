@@ -7,11 +7,11 @@ import ProfilePhotoSelector from '../../components/layouts/Inputs/ProfilePhotoSe
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [adminInviteToken, setAdminInviteToken] = useState("");
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [adminInviteToken, setAdminInviteToken] = useState('');
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
@@ -19,157 +19,108 @@ const SignUp = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    if (!profilePic) {
-      setError("Please upload a profile picture.");
-      return;
-    }
-    if (!fullName || fullName.length < 3) {
-      setError("Full name must be at least 3 characters.");
-      return;
-    }
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-    if (!password || password.length < 8) {
-      setError("Password must be at least 8 characters.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+    if (!profilePic) return setError('Upload a profile picture.');
+    if (fullName.length < 3) return setError('Name must be at least 3 characters.');
+    if (!validateEmail(email)) return setError('Enter a valid email.');
+    if (password.length < 8) return setError('Password must be at least 8 characters.');
+    if (password !== confirmPassword) return setError('Passwords do not match.');
 
     setError(null);
 
     try {
-      // Upload profile picture
       const formData = new FormData();
-      formData.append("image", profilePic);
+      formData.append('image', profilePic);
 
-      const uploadRes = await axios.post(
-        "http://localhost:8000/api/auth/upload-image",
-        formData
-      );
+      const uploadRes = await axios.post('http://localhost:8000/api/auth/upload-image', formData);
       const profileImageUrl = uploadRes.data.imageUrl;
 
-      // Register user
-      const registerRes = await axios.post(
-        "http://localhost:8000/api/auth/register",
-        {
-          name: fullName,
-          email,
-          password,
-          profileImageUrl,
-          adminInviteToken,
-        }
-      );
+      const res = await axios.post('http://localhost:8000/api/auth/register', {
+        name: fullName,
+        email,
+        password,
+        profileImageUrl,
+        adminInviteToken,
+      });
 
-      const { token, role } = registerRes.data;
+      const { token, role } = res.data;
 
-      localStorage.setItem("token", token);
-
-      if (role === "admin") {
-        navigate("/admin-dashboard");
-      } else {
-        navigate("/dashboard");
-      }
+      localStorage.setItem('token', token);
+      navigate(role === 'admin' ? '/admin-dashboard' : '/dashboard');
     } catch (err) {
-      console.error("Signup Error:", err);
-      const msg =
-        err.response?.data?.message || "Registration failed. Please try again.";
+      const msg = err.response?.data?.message || 'Registration failed. Please try again.';
       setError(msg);
     }
   };
 
   return (
     <AuthLayout>
-      <div className="lg:w-[70%] h-auto md:h-full flex flex-col justify-center px-4 sm:px-8">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-2 text-center lg:text-left">
-          Create an Account
-        </h3>
-        <p className="text-sm text-gray-500 mb-6 text-center lg:text-left">
-          Join us today by entering your details below.
-        </p>
+      <div className="w-full max-w-md mx-auto px-4 sm:px-8 py-10">
+        <div className="bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/10">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">Create Account</h2>
+          <p className="text-sm text-gray-600 mb-6 text-center">Join us today</p>
 
-        {error && <p className="text-red-500 mb-4 text-sm text-center lg:text-left">{error}</p>}
+          {error && (
+            <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+          )}
 
-        <form onSubmit={handleSignUp} className="space-y-4">
-          <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
+          <form onSubmit={handleSignUp} className="space-y-5">
+            <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="e.g., Sahil Haq"
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              placeholder="Full Name"
+              className="w-full border border-gray-300 rounded-xl p-2 focus:ring-2 focus:ring-blue-500 text-sm"
             />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g., sahil@example.com"
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              placeholder="Email Address"
+              className="w-full border border-gray-300 rounded-xl p-2 focus:ring-2 focus:ring-blue-500 text-sm"
             />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Minimum 8 characters"
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              placeholder="Password"
+              className="w-full border border-gray-300 rounded-xl p-2 focus:ring-2 focus:ring-blue-500 text-sm"
             />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Re-enter your password"
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              placeholder="Confirm Password"
+              className="w-full border border-gray-300 rounded-xl p-2 focus:ring-2 focus:ring-blue-500 text-sm"
             />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Admin Invite Token (Optional)</label>
             <input
               type="text"
               value={adminInviteToken}
               onChange={(e) => setAdminInviteToken(e.target.value)}
-              placeholder="e.g., ADMIN-123456"
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Admin Token (Optional)"
+              className="w-full border border-gray-300 rounded-xl p-2 focus:ring-2 focus:ring-blue-500 text-sm"
             />
-          </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-          >
-            Sign Up
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-xl shadow-md transition-all text-sm font-semibold"
+            >
+              Sign Up
+            </button>
 
-        <p className="mt-4 text-sm text-center text-gray-500">
-          Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline font-medium">
-            Log in
-          </Link>
-        </p>
+            <p className="text-xs text-center text-gray-500 mt-4">
+              Already have an account?{' '}
+              <Link to="/login" className="text-blue-600 hover:underline font-medium">
+                Login
+              </Link>
+            </p>
+          </form>
+        </div>
       </div>
     </AuthLayout>
   );

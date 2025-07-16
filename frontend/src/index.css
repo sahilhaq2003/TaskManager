@@ -8,15 +8,14 @@
   --color-primary:#1368EC;
 }
 
-@layer base{
-  html{
-    font-family:var(--font-display);
-    
+@layer base {
+  html {
+    font-family: var(--font-display);
   }
 
-  body{
+  body {
     background-color: #fcfbfc;
-    overflow: hidden;
+    overflow-x: hidden; /* allow vertical scrolling */
   }
 }
 
