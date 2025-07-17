@@ -6,6 +6,7 @@ export const API_PATHS = {
     REGISTER: `${BASE_URL}/api/auth/register`,
     GET_USER: `${BASE_URL}/api/auth/profile`,
     UPDATE_USER: `${BASE_URL}/api/auth/profile`,
+    UPLOAD_IMAGE: `${BASE_URL}/api/auth/upload-image`, // ✅ corrected to match SignUp.jsx
   },
 
   USERS: {
@@ -32,6 +33,7 @@ export const API_PATHS = {
   },
 
   IMAGE: {
-    UPLOAD_IMAGE: `${BASE_URL}/api/image/upload`, // Fixed to match updated backend route
+    // Keeping this here in case you later move the upload route
+    UPLOAD_IMAGE: `${BASE_URL}/api/auth/upload-image`,
   },
 };

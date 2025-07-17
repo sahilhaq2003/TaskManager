@@ -4,6 +4,8 @@ import axios from 'axios';
 import AuthLayout from '../../components/layouts/AuthLayout';
 import { validateEmail } from '../../utils/helper';
 import ProfilePhotoSelector from '../../components/layouts/Inputs/ProfilePhotoSelector';
+import { API_PATHS } from '../../utils/apiPaths';
+
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
@@ -31,10 +33,10 @@ const SignUp = () => {
       const formData = new FormData();
       formData.append('image', profilePic);
 
-      const uploadRes = await axios.post('http://localhost:8000/api/auth/upload-image', formData);
+      const uploadRes = await axios.post(API_PATHS.IMAGE.UPLOAD_IMAGE, formData);
       const profileImageUrl = uploadRes.data.imageUrl;
 
-      const res = await axios.post('http://localhost:8000/api/auth/register', {
+      const res = await axios.post(API_PATHS.AUTH.REGISTER, {
         name: fullName,
         email,
         password,
