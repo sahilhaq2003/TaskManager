@@ -2,10 +2,14 @@ import React, { useContext, useState, useRef, useEffect } from "react";
 import { HiOutlineMenuAlt2, HiOutlineLogout } from "react-icons/hi";
 import { UserContext } from "../../context/userContext";
 
+
 const Navbar = ({ onMenuToggle }) => {
   const { user, logout } = useContext(UserContext);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Construct full image URL if image filename exists
+  const userImageUrl = user?.image ? `${BASE_URL}/uploads/users/${user.image}` : null;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -31,7 +35,7 @@ const Navbar = ({ onMenuToggle }) => {
             <HiOutlineMenuAlt2 className="w-5 h-5" />
           </button>
           <span className="text-sm font-medium text-gray-500 hidden md:inline">
-            Dashboard
+            Task Manager
           </span>
         </div>
 
@@ -43,15 +47,27 @@ const Navbar = ({ onMenuToggle }) => {
             aria-expanded={open}
             aria-label="User menu"
           >
-            <div className="w-8 h-8 bg-gray-100 rounded-full flex justify-center items-center text-gray-600 font-medium text-sm">
-              {user?.name?.charAt(0).toUpperCase()}
-            </div>
+            {userImageUrl ? (
+              <img
+                src={userImageUrl}
+                alt={`${user.name} profile`}
+                className="w-8 h-8 rounded-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null; // prevents looping
+                  e.currentTarget.src = "/default-avatar.png"; // fallback image path
+                }}
+              />
+            ) : (
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex justify-center items-center text-gray-600 font-medium text-sm">
+                {user?.name?.charAt(0).toUpperCase()}
+              </div>
+            )}
             <div className="hidden sm:block text-left">
               <p className="text-sm font-medium text-gray-800">{user?.name}</p>
               <p className="text-xs text-gray-500">{user?.role}</p>
             </div>
           </button>
-          
+
           {/* Dropdown Menu */}
           {open && (
             <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-md border border-gray-100 py-1 z-50">

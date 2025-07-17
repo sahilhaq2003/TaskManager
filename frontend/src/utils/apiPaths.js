@@ -6,7 +6,7 @@ export const API_PATHS = {
     REGISTER: `${BASE_URL}/api/auth/register`,
     GET_USER: `${BASE_URL}/api/auth/profile`,
     UPDATE_USER: `${BASE_URL}/api/auth/profile`,
-    UPLOAD_IMAGE: `${BASE_URL}/api/auth/upload-image`, // ✅ corrected to match SignUp.jsx
+    UPLOAD_IMAGE: `${BASE_URL}/api/auth/upload-image`, 
   },
 
   USERS: {
