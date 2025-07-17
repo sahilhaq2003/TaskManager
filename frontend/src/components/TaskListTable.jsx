@@ -10,19 +10,36 @@ const TaskListTable = ({ tableData }) => {
     );
   }
 
+  // Helper for priority badge colors
+  const priorityClass = (priority) => {
+    switch (priority?.toLowerCase()) {
+      case 'high':
+        return 'bg-red-100 text-red-700';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'low':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
   return (
     <div className="overflow-x-auto rounded-2xl bg-white shadow-sm">
       <table className="min-w-full text-sm text-gray-800">
         <thead>
           <tr>
             <th className="text-left px-5 py-4 font-semibold text-gray-600 uppercase tracking-wide text-xs">
-              Task Name
+              Name
             </th>
             <th className="text-left px-5 py-4 font-semibold text-gray-600 uppercase tracking-wide text-xs">
               Status
             </th>
             <th className="text-left px-5 py-4 font-semibold text-gray-600 uppercase tracking-wide text-xs">
-              Due Date
+              Priority
+            </th>
+            <th className="text-left px-5 py-4 font-semibold text-gray-600 uppercase tracking-wide text-xs">
+              Created On
             </th>
           </tr>
         </thead>
@@ -49,8 +66,15 @@ const TaskListTable = ({ tableData }) => {
                   {task.status}
                 </span>
               </td>
+              <td className="px-5 py-4">
+                <span
+                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${priorityClass(task.priority)}`}
+                >
+                  {task.priority || 'N/A'}
+                </span>
+              </td>
               <td className="px-5 py-4 text-gray-500 text-sm">
-                {moment(task.dueDate).format('MMMM D, YYYY')}
+                {moment(task.createdOn).format('MMMM D, YYYY')}
               </td>
             </tr>
           ))}
