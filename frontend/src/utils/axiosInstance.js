@@ -9,6 +9,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
+  timeout: 10000, // optional: adds request timeout (10s)
 });
 
 // Add token to every request if available
@@ -23,26 +24,31 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle responses
+// Handle responses and errors globally
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      const { status, data } = error.response;
+      const { status } = error.response;
 
-      if (status === 401) {
-        console.error('Unauthorized - redirecting to login');
-        // Optionally: window.location.href = "/login";
-      } else if (status === 403) {
-        console.error('Forbidden access');
-      } else if (status === 404) {
-        console.error('Resource not found');
-      } else if (status === 500) {
-        console.error('Server error');
-      } else {
-        console.error('API Error:', data);
+      switch (status) {
+        case 401:
+          console.error('Unauthorized - redirecting to login');
+          // Optional: window.location.href = '/login';
+          break;
+        case 403:
+          console.error('Forbidden - you do not have permission');
+          break;
+        case 404:
+          console.error('Not Found - the resource does not exist');
+          break;
+        case 500:
+          console.error('Internal Server Error');
+          break;
+        default:
+          console.error('API Error:', error.response.data);
       }
-    } else if (error.code === "ECONNABORTED") {
+    } else if (error.code === 'ECONNABORTED') {
       console.error('Request timeout');
     } else {
       console.error('Network error:', error.message);
