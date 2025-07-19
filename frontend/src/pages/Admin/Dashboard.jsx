@@ -25,7 +25,8 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const COLORS = ['#FF8042', '#FFD700', '#0088FE'];
+// Updated pie chart colors to match card colors: Pending (red), In Progress (yellow), Completed (green)
+const COLORS = ['#ef4444', '#eab308', '#22c55e']; // red, yellow, green
 const PRIORITY_COLORS = ['#82ca9d', '#8884d8', '#ffbb28'];
 
 const Dashboard = () => {
@@ -107,34 +108,18 @@ const Dashboard = () => {
     <DashboardLayout activeMenu="dashboard">
       <main className="mx-auto px-4 sm:px-6 lg:px-8 space-y-12 max-w-7xl">
         {/* Greeting Section */}
-        <section
-          className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl shadow-md p-6 sm:p-8 space-y-6"
-          aria-label="Greeting and task summary"
-        >
+        <section className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl shadow-md p-6 sm:p-8 space-y-6">
           <div>
-            <h1
-              className="text-gray-800 font-semibold leading-tight"
-              style={{ fontSize: 'clamp(1rem, 2vw, 1.75rem)' }}
-            >
+            <h1 className="text-gray-800 font-semibold leading-tight text-xl sm:text-2xl">
               Good Morning, {user?.name || 'User'}!
             </h1>
-            <p
-              className="text-gray-600 mt-2"
-              style={{ fontSize: 'clamp(0.8rem, 1.3vw, 1.125rem)' }}
-            >
+            <p className="text-gray-600 mt-2 text-sm sm:text-base">
               {moment().format('dddd, MMMM Do YYYY')}
             </p>
           </div>
 
           {/* Info Cards */}
-          <div
-            className="
-              flex flex-wrap justify-center gap-4
-              px-2 sm:px-4
-              max-w-full
-            "
-            style={{ overflowWrap: 'break-word' }}
-          >
+          <div className="flex flex-wrap justify-center gap-4">
             <InfoCard
               icon={<IoMdCard className="text-white" size={20} />}
               label="Total Tasks"
@@ -169,11 +154,11 @@ const Dashboard = () => {
         {/* Charts Section */}
         <section className="flex flex-col md:flex-row md:space-x-8 space-y-10 md:space-y-0">
           {/* Pie Chart */}
-          <div className="flex-1 bg-white rounded-2xl shadow-md p-5 min-w-[320px] max-w-full">
+          <div className="flex-1 bg-white rounded-2xl shadow-md p-5 min-w-[320px]">
             <h3 className="text-lg font-semibold mb-4 text-gray-800 text-center md:text-left">
               Task Status Distribution
             </h3>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={pieChartData}
@@ -181,22 +166,43 @@ const Dashboard = () => {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={80}
+                  outerRadius={90}
+                  innerRadius={45}
                   fill="#8884d8"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  paddingAngle={2}
+                  label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                   labelLine={false}
+                  isAnimationActive={true}
                 >
                   {pieChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
-                <ReTooltip />
+                <ReTooltip
+                  formatter={(value, name) => [`${value} Tasks`, name]}
+                />
               </PieChart>
             </ResponsiveContainer>
+
+            {/* Legend */}
+            <div className="flex justify-center mt-4 flex-wrap gap-4 text-sm text-gray-600">
+              {pieChartData.map((entry, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <span
+                    className="inline-block w-3 h-3 rounded-full"
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  ></span>
+                  <span>{entry.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Bar Chart */}
-          <div className="flex-1 bg-white rounded-2xl shadow-md p-5 min-w-[320px] max-w-full">
+          <div className="flex-1 bg-white rounded-2xl shadow-md p-5 min-w-[320px]">
             <h3 className="text-lg font-semibold mb-4 text-gray-800 text-center md:text-left">
               Task Priority Levels
             </h3>
@@ -208,10 +214,7 @@ const Dashboard = () => {
                 <ReTooltip />
                 <Bar dataKey="value" fill="#8884d8" radius={[4, 4, 0, 0]}>
                   {barChartData.map((entry, index) => (
-                    <Cell
-                      key={`bar-cell-${index}`}
-                      fill={PRIORITY_COLORS[index % PRIORITY_COLORS.length]}
-                    />
+                    <Cell key={`bar-cell-${index}`} fill={PRIORITY_COLORS[index % PRIORITY_COLORS.length]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -219,7 +222,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        {/* Recent Tasks Section */}
+        {/* Recent Tasks */}
         <section className="bg-white rounded-2xl shadow-md p-5 sm:p-6 space-y-5 overflow-x-auto">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 whitespace-nowrap">

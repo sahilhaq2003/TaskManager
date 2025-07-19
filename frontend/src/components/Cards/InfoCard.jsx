@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 const COLOR_CLASSES = {
   blue: 'bg-gradient-to-r from-indigo-600 to-blue-500',
   red: 'bg-gradient-to-r from-rose-600 to-pink-500',
@@ -8,6 +9,8 @@ const COLOR_CLASSES = {
   purple: 'bg-gradient-to-r from-purple-600 to-violet-500',
   gray: 'bg-gradient-to-r from-gray-600 to-gray-500',
 };
+
+
 
 const InfoCard = ({ icon, label, value, color = 'blue', className = '' }) => {
   const colorClass = COLOR_CLASSES[color] || COLOR_CLASSES.blue;
