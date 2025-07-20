@@ -58,7 +58,7 @@ const SlideMenu = () => {
 
       {/* Footer */}
       <div className="p-4 border-t border-gray-100 text-center bg-gray-50 rounded-b-lg">
-        <p className="text-xs text-gray-500">© 2025 YourApp. All rights reserved.</p>
+        <p className="text-xs text-gray-500">© 2025 Developed By Sahil Haq.<br/> All rights reserved.</p>
       </div>
     </div>
   );
