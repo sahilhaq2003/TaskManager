@@ -43,3 +43,33 @@
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
+
+
+
+
+/* Hide scrollbars but keep scroll functionality */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.custom-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Optional: Add transition for hover effects */
+button:hover,
+li:hover {
+  transition: transform 0.3s ease, background-color 0.2s ease;
+}
+
+
+
+
+
+
+
+
+
+

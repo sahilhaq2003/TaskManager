@@ -156,7 +156,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
                   {users.map((user) => (
                     <li
                       key={user._id}
-                      className="flex items-center gap-3 p-3 rounded-lg border border-gray-300 hover:bg-blue-50 cursor-pointer select-none"
+                      className="flex items-center gap-3 p-3 rounded-lg border border-gray-300 hover:bg-blue-50 cursor-pointer select-none transition-all"
                       onClick={() => toggleUser(user._id)}
                       role="checkbox"
                       aria-checked={tempSelected.includes(user._id)}

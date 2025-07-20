@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '../../components/layouts/DashboardLayout';
-import { PRIORITY_DATA } from "../../utils/data";
+import { PRIORITY_DATA } from '../../utils/data';
 import axiosInstance from '../../utils/axiosInstance';
 import { toast } from 'react-toastify';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -9,6 +9,10 @@ import { LuTrash2 } from 'react-icons/lu';
 import { API_PATHS } from '../../utils/apiPaths';
 import SelectUsers from '../../components/layouts/Inputs/SelectUsers';
 
+/**
+ * Task creation and update page component.
+ * Handles both creating and editing tasks.
+ */
 export default function CreateTask() {
   const location = useLocation();
   const { taskId } = location.state || {};
@@ -23,7 +27,6 @@ export default function CreateTask() {
     todoChecklist: [],
     attachments: [],
   });
-
   const [loading, setLoading] = useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
 
@@ -53,7 +56,7 @@ export default function CreateTask() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!taskData.title || !taskData.description) {
-      toast.error("Please fill in required fields.");
+      toast.error('Please fill in required fields.');
       return;
     }
     const cleanedData = sanitizeTaskData();
@@ -64,10 +67,10 @@ export default function CreateTask() {
     setLoading(true);
     try {
       await axiosInstance.post(API_PATHS.TASKS.CREATE_TASK, data);
-      toast.success("Task created successfully!");
-      navigate("/tasks");
+      toast.success('Task created successfully!');
+      navigate('/tasks');
     } catch (err) {
-      toast.error(err.response?.data?.message || "Task creation failed");
+      toast.error(err.response?.data?.message || 'Task creation failed');
     } finally {
       setLoading(false);
     }
@@ -77,10 +80,10 @@ export default function CreateTask() {
     setLoading(true);
     try {
       await axiosInstance.put(API_PATHS.TASKS.UPDATE_TASK(taskId), data);
-      toast.success("Task updated successfully!");
-      navigate("/tasks");
+      toast.success('Task updated successfully!');
+      navigate('/tasks');
     } catch (err) {
-      toast.error(err.response?.data?.message || "Task update failed");
+      toast.error(err.response?.data?.message || 'Task update failed');
     } finally {
       setLoading(false);
     }
@@ -90,10 +93,10 @@ export default function CreateTask() {
     setLoading(true);
     try {
       await axiosInstance.delete(API_PATHS.TASKS.DELETE_TASK(taskId));
-      toast.success("Task deleted successfully!");
-      navigate("/tasks");
+      toast.success('Task deleted successfully!');
+      navigate('/tasks');
     } catch (err) {
-      toast.error(err.response?.data?.message || "Task deletion failed");
+      toast.error(err.response?.data?.message || 'Task deletion failed');
     } finally {
       setLoading(false);
     }
@@ -113,13 +116,9 @@ export default function CreateTask() {
         attachments: task.attachments || [],
       });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to load task data");
+      toast.error(err.response?.data?.message || 'Failed to load task data');
     }
   };
-
-  useEffect(() => {
-    if (taskId) getTaskDetailsById();
-  }, [taskId]);
 
   const handleChecklistChange = (index, value) => {
     const updated = [...taskData.todoChecklist];
@@ -132,71 +131,60 @@ export default function CreateTask() {
     handleValueChange('todoChecklist', updated);
   };
 
+  useEffect(() => {
+    if (taskId) getTaskDetailsById();
+  }, [taskId]);
+
   return (
     <DashboardLayout activeMenu="create-task">
-      <div className="max-w-4xl mx-auto p-6 sm:p-8 bg-white rounded-xl shadow-md mt-6 sm:mt-10">
-        <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
+      <div className="max-w-4xl mx-auto p-6 sm:p-8 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-200 rounded-xl shadow-xl mt-6 sm:mt-10">
+        <h2 className="text-3xl font-semibold text-center text-gray-900">
           {taskId ? 'Update Task' : 'Create Task'}
         </h2>
-
+        <br />
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Task Info */}
-          <div className="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Task Information</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
-                <input
-                  type="text"
-                  value={taskData.title}
-                  onChange={(e) => handleValueChange('title', e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-2.5 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                  placeholder="Enter task title"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea
-                  rows={4}
-                  value={taskData.description}
-                  onChange={(e) => handleValueChange('description', e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-2.5 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition"
-                  placeholder="Enter task description"
-                  required
-                />
-              </div>
+          {/* Task Info Section */}
+          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-lg font-medium text-gray-800 mb-4">Task Information</h3>
+            <div className="space-y-6">
+              <InputField
+                label="Task Title"
+                value={taskData.title}
+                onChange={(e) => handleValueChange('title', e.target.value)}
+                required
+                placeholder="Enter task title"
+              />
+              <TextAreaField
+                label="Description"
+                value={taskData.description}
+                onChange={(e) => handleValueChange('description', e.target.value)}
+                required
+                placeholder="Enter task description"
+              />
             </div>
           </div>
 
-          {/* Task Settings */}
-          <div className="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Task Settings</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                <select
-                  value={taskData.priority}
-                  onChange={(e) => handleValueChange('priority', e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                >
-                  {PRIORITY_DATA.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                <input
-                  type="date"
-                  value={taskData.dueDate}
-                  onChange={(e) => handleValueChange('dueDate', e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                />
-              </div>
+          {/* Task Settings Section */}
+          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-lg font-medium text-gray-800 mb-4">Task Settings</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <SelectField
+                label="Priority"
+                value={taskData.priority}
+                onChange={(e) => handleValueChange('priority', e.target.value)}
+                options={PRIORITY_DATA}
+              />
+              <InputField
+                type="date"
+                label="Due Date"
+                value={taskData.dueDate}
+                onChange={(e) => handleValueChange('dueDate', e.target.value)}
+              />
             </div>
 
-            {/* Improved Assign To */}
+            {/* Assign To Users Section */}
             <div className="mt-6">
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Assign To</label>
+              <label className="block text-sm font-medium text-gray-900 mb-2">Assign To</label>
               <div className="border border-gray-300 rounded-lg shadow-sm p-3 hover:shadow-md transition cursor-pointer bg-white">
                 <SelectUsers
                   selectedUsers={taskData.assignedTo}
@@ -206,41 +194,30 @@ export default function CreateTask() {
             </div>
           </div>
 
-          {/* Attachments */}
-          <div className="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Attachments</h3>
-            <input
-              type="text"
+          {/* Attachments Section */}
+          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-lg font-medium text-gray-800 mb-4">Attachments</h3>
+            <InputField
+              label="Attachments"
               value={taskData.attachments.join(',')}
               onChange={(e) =>
                 handleValueChange('attachments', e.target.value.split(',').map(i => i.trim()))
               }
-              className="w-full border border-gray-300 px-4 py-2.5 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               placeholder="Enter comma-separated URLs"
             />
           </div>
 
-          {/* Checklist */}
-          <div className="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Checklist</h3>
+          {/* Checklist Section */}
+          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-lg font-medium text-gray-800 mb-4">TODO Checklist</h3>
             <div className="space-y-3">
               {taskData.todoChecklist.map((item, idx) => (
-                <div key={item.id || idx} className="flex items-center gap-3">
-                  <input
-                    type="text"
-                    value={item.text || ''}
-                    onChange={(e) => handleChecklistChange(idx, e.target.value)}
-                    className="flex-grow border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                    placeholder="Enter checklist item"
-                  />
-                  <button 
-                    type="button" 
-                    onClick={() => handleChecklistRemove(idx)}
-                    className="p-2 text-gray-500 hover:text-red-500 transition"
-                  >
-                    <LuTrash2 className="w-5 h-5" />
-                  </button>
-                </div>
+                <ChecklistItem
+                  key={item.id || idx}
+                  value={item.text || ''}
+                  onChange={(e) => handleChecklistChange(idx, e.target.value)}
+                  onRemove={() => handleChecklistRemove(idx)}
+                />
               ))}
               <button
                 type="button"
@@ -252,73 +229,136 @@ export default function CreateTask() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
                 </svg>
-                Add Item
+                Add Task
               </button>
             </div>
           </div>
 
-          {/* Buttons */}
+          {/* Buttons Section */}
           <div className="flex flex-col sm:flex-row justify-between gap-4 pt-6 border-t border-gray-200">
             <div className="flex flex-wrap gap-3">
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
-                           text-white px-5 py-2.5 rounded-lg shadow-md font-semibold transition
-                           disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base"
               >
-                {loading ? (
-                  'Processing...'
-                ) : (
-                  <>
-                    {taskId ? 'Update Task' : 'Create Task'}
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </>
-                )}
-              </button>
-              <button
+                {loading ? 'Processing...' : taskId ? 'Update Task' : 'Create Task'}
+              </Button>
+              <Button
                 type="button"
                 onClick={clearData}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-semibold shadow-sm transition text-sm sm:text-base"
+                color="gray"
               >
                 Clear
-              </button>
+              </Button>
             </div>
             {taskId && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setOpenDeleteAlert(true)}
-                className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2.5 rounded-lg font-semibold shadow-sm transition text-sm sm:text-base"
+                color="red"
               >
                 Delete Task
-              </button>
+              </Button>
             )}
           </div>
 
           {/* Delete Alert */}
           {openDeleteAlert && (
-            <div className="mt-6 p-5 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800 font-medium mb-3">Are you sure you want to delete this task?</p>
-              <div className="flex gap-3 flex-wrap">
-                <button
-                  onClick={deleteTask}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium text-sm sm:text-base"
-                >
-                  Yes, Delete
-                </button>
-                <button
-                  onClick={() => setOpenDeleteAlert(false)}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md font-medium text-sm sm:text-base"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
+            <DeleteAlert
+              onConfirm={deleteTask}
+              onCancel={() => setOpenDeleteAlert(false)}
+            />
           )}
         </form>
       </div>
     </DashboardLayout>
   );
 }
+
+// Reusable Input Field Component
+const InputField = ({ label, type = 'text', value, onChange, required, placeholder }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+    <input
+      type={type}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className="w-full border border-gray-300 px-5 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+      placeholder={placeholder}
+    />
+  </div>
+);
+
+// Reusable Text Area Component
+const TextAreaField = ({ label, value, onChange, required, placeholder }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+    <textarea
+      rows={4}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className="w-full border border-gray-300 px-5 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"
+      placeholder={placeholder}
+    />
+  </div>
+);
+
+// Reusable Select Field Component
+const SelectField = ({ label, value, onChange, options }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+    <select
+      value={value}
+      onChange={onChange}
+      className="w-full border border-gray-300 px-5 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+    >
+      {options.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+    </select>
+  </div>
+);
+
+// Reusable Checklist Item Component
+const ChecklistItem = ({ value, onChange, onRemove }) => (
+  <div className="flex items-center gap-3">
+    <input
+      type="text"
+      value={value}
+      onChange={onChange}
+      className="flex-grow border border-gray-300 px-5 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+      placeholder="Enter checklist item"
+    />
+    <button type="button" onClick={onRemove} className="p-3 text-gray-500 hover:text-red-500 transition-all">
+      <LuTrash2 className="w-6 h-6" />
+    </button>
+  </div>
+);
+
+// Reusable Delete Alert Component
+const DeleteAlert = ({ onConfirm, onCancel }) => (
+  <div className="mt-6 p-6 bg-red-100 border border-red-300 rounded-xl">
+    <p className="text-red-800 font-medium mb-4">Are you sure you want to delete this task?</p>
+    <div className="flex gap-4 flex-wrap">
+      <button onClick={onConfirm} className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium text-sm">
+        Yes, Delete
+      </button>
+      <button onClick={onCancel} className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-medium text-sm">
+        Cancel
+      </button>
+    </div>
+  </div>
+);
+
+// Button Component for reusable button styles
+const Button = ({ children, type = 'button', color = 'blue', ...props }) => (
+  <button
+    type={type}
+    {...props}
+    className={`px-6 py-3 rounded-lg font-semibold shadow-md transition-all text-sm sm:text-base ${
+      color === 'blue' ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white' : ''
+    } ${color === 'gray' ? 'bg-gray-200 hover:bg-gray-300 text-gray-800' : ''} ${color === 'red' ? 'bg-red-600 hover:bg-red-700 text-white' : ''}`}
+  >
+    {children}
+  </button>
+);
